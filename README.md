@@ -16,39 +16,14 @@ El frontend consume endpoints públicos con CORS controlado.
 ---
 
 ## 📁 Estructura (resumen)
-server/
-├─ package.json
-├─ .env.example
-└─ src/
-├─ index.js
-├─ config.js
-├─ db.js
-├─ routes/
-│ ├─ clientes.js
-│ └─ paquetes.js
-├─ controllers/
-│ ├─ clientes.controller.js
-│ └─ paquetes.controller.js
-├─ models/
-│ ├─ cliente.model.js
-│ ├─ paquete.model.js
-│ └─ associations.js
-├─ scripts/
-│ ├─ migrate.js
-│ └─ seed.js
-└─ utils/
-└─ validate.js
+
+![alt text](image.png)
 
 ---
 
 ## 🚦 Rutas base
 
-/api
-├─ /health
-├─ /paquetes
-│ └─ /:idOrSlug
-└─ /clientes
-
+![alt text](image-1.png)
 
 ---
 
