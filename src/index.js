@@ -1,4 +1,3 @@
-// index.js
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -9,16 +8,15 @@ import clientesRouter from './routes/clientes.js';
 import paquetesRouter from './routes/paquetes.js';
 import { setupAssociations } from './models/associations.js';
 
-setupAssociations(); // relaciones listas
+setupAssociations();
 
 const app = express();
 app.disable('x-powered-by');
 
-// --- CORS CONFIG ---
+// --- CORS ---
 const corsOptions = {
   origin(origin, cb) {
-    // Permite peticiones sin 'Origin' (curl, server-side) o que estén en la lista
-    if (!origin) return cb(null, true);
+    if (!origin) return cb(null, true); // curl, server-side, etc.
     if (ALLOWED_ORIGINS.length === 0 || ALLOWED_ORIGINS.includes(origin)) {
       return cb(null, true);
     }
@@ -26,37 +24,33 @@ const corsOptions = {
   },
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: false, // Cambia a true SOLO si usas cookies/credenciales
+  credentials: false,               // pon true solo si usas cookies/credenciales
   preflightContinue: false,
-  optionsSuccessStatus: 204, // para navegadores viejos
+  optionsSuccessStatus: 204,
 };
 
-// Asegura respuestas cacheables por origen distinto
+// Importante para caches intermedios
 app.use((req, res, next) => {
   res.setHeader('Vary', 'Origin');
   next();
 });
 
 app.use(helmet());
-
-// Aplica CORS global y responde preflights
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+
+// ⛔️ ANTES: app.options('*', cors(corsOptions));
+// ✅ AHORA (Express 5 friendly): preflight para cualquier ruta
+app.options(/.*/, cors(corsOptions));
+// Si prefieres solo /api: app.options(/^\/api\/.*/i, cors(corsOptions));
 
 if (LOG_REQUESTS) app.use(morgan('dev'));
 app.use(express.json());
 
-// Healthcheck
 app.get('/api/health', async (_req, res) => {
-  try {
-    await assertDbConnection();
-    res.json({ ok: true });
-  } catch {
-    res.status(500).json({ ok: false });
-  }
+  try { await assertDbConnection(); res.json({ ok: true }); }
+  catch { res.status(500).json({ ok: false }); }
 });
 
-// Rutas API
 app.use('/api/clientes', clientesRouter);
 app.use('/api/paquetes', paquetesRouter);
 
@@ -65,10 +59,9 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Not Found' });
 });
 
-// Error handler (incluyendo CORS)
+// Error handler (incluye errores de CORS)
 app.use((err, req, res, _next) => {
   if (err?.message?.startsWith('CORS:')) {
-    // No es un 500; es un bloqueo CORS
     return res.status(403).json({
       error: 'CORS blocked',
       origin: req.headers.origin || null,
