@@ -7,7 +7,7 @@ export const NODE_ENV = process.env.NODE_ENV || 'development';
 export const HOST     = process.env.HOST || '0.0.0.0';
 export const PORT     = Number(process.env.PORT || 3001);
 
-export const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || '')
+export const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ?? '')
   .split(',').map(s => s.trim()).filter(Boolean);
 
 // DB: toma DB_* o, si no, MYSQL* (Railway)
@@ -20,3 +20,4 @@ export const DB_SSL  = bool(pick(process.env.DB_SSL, process.env.MYSQL_SSL), fal
 
 export const LOG_REQUESTS = bool(process.env.LOG_REQUESTS, true);
 export const ENABLE_PACKAGES = bool(process.env.ENABLE_PACKAGES, false);
+export const LOG_CORS = bool(process.env.LOG_CORS, true);
